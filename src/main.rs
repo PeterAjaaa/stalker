@@ -1,5 +1,6 @@
 use clap::{arg, Command};
 use terminal_size::{Width, terminal_size};
+use termion::{color, style};
 
 fn main() {
     let app = Command::new("stalker")
@@ -52,7 +53,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
 
     match app.subcommand() {
         Some(("init", _init_subcommand)) => {
-            println!("stalker initialized...");
+            println!("{}{}{}stalker initialized...", style::Bold, style::Italic,color::Fg(color::Green));
             // TODO: Insert function to initialize a new stalker instance.
         }
         Some(("add", add_subcommand)) => {
@@ -77,7 +78,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             // TODO: Insert function to execute commands on the shell.
         }
         Some(("execute", _execute_subcommand)) => {
-            println!("Running stalker...");
+            println!("{}{}{}Running stalker...", style::Bold, style::Italic,color::Fg(color::Green));
             // TODO: Insert function to run the stalker instance.
         }
         _ => (), //Done because every subcommand should raise help on error.
