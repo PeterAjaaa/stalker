@@ -10,7 +10,7 @@ fn main() {
         .about("stalker is a fast and simple file watcher and executor with git-like syntax.")
         .arg_required_else_help(true)
         .subcommand(Command::new("init").about("Initialize a stalker instance.
-Default stalker instance will be made on HOME directory under '.stalker' folder."))
+Default stalker instance will be made on $HOME directory under '.stalker' folder."))
         .subcommand(
             Command::new("add")
                 .about("Add path(s) to the stalk-list")
