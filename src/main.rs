@@ -1,5 +1,9 @@
+use std::path::PathBuf;
+
 use clap::{arg, Command};
-use terminal_size::{Width, terminal_size};
+use dirs::home_dir;
+use stalker::create_stalker_dir;
+use terminal_size::{terminal_size, Width};
 use termion::{color, style};
 
 fn main() {
@@ -9,8 +13,15 @@ fn main() {
         .author("Peter <peterajaaa@gmail.com>")
         .about("stalker is a fast and simple file watcher and executor with git-like syntax.")
         .arg_required_else_help(true)
-        .subcommand(Command::new("init").about("Initialize a stalker instance.
-Default stalker instance will be made on $HOME directory under '.stalker' folder."))
+        .subcommand(
+            Command::new("init")
+                .about("Initialize a stalker instance.
+Default stalker instance will be made on $HOME directory under '.stalker' folder.")
+                .arg(
+                    arg!([PATH])
+                    .takes_value(true)
+                )
+            )
         .subcommand(
             Command::new("add")
                 .about("Add path(s) to the stalk-list")
@@ -52,9 +63,20 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
         .get_matches();
 
     match app.subcommand() {
-        Some(("init", _init_subcommand)) => {
-            println!("{}{}{}stalker initialized...", style::Bold, style::Italic,color::Fg(color::Green));
-            // TODO: Insert function to initialize a new stalker instance.
+        Some(("init", init_path)) => {
+            println!(
+                "{}{}stalker initialized...",
+                style::Bold,
+                color::Fg(color::Green)
+            );
+
+            let default_home_path = home_dir().unwrap().join(".stalker");
+            let home_path = match init_path.get_one::<PathBuf>("PATH") {
+                Some(path) => path.join(".stalker"),
+                None => default_home_path,
+            };
+
+            create_stalker_dir(&home_path);
         }
         Some(("add", add_subcommand)) => {
             /* Used Vec<&String> instead of Vec<_> to better show the data types within the vector.
@@ -71,14 +93,19 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             // TODO: Insert function to remove paths from stalk-list.
         }
         Some(("do", do_subcommand)) => {
-            let commands: Vec<&String> = do_subcommand 
+            let commands: Vec<&String> = do_subcommand
                 .get_many::<String>("COMMANDS")
                 .unwrap()
                 .collect();
             // TODO: Insert function to execute commands on the shell.
         }
         Some(("execute", _execute_subcommand)) => {
-            println!("{}{}{}Running stalker...", style::Bold, style::Italic,color::Fg(color::Green));
+            println!(
+                "{}{}{}Running stalker...",
+                style::Bold,
+                style::Italic,
+                color::Fg(color::Green)
+            );
             // TODO: Insert function to run the stalker instance.
         }
         _ => (), //Done because every subcommand should raise help on error.
