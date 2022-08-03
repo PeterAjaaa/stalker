@@ -70,6 +70,8 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                 color::Fg(color::Green)
             );
 
+            /* &home_path is used because default_home_path is a PathBuf and home_path is also a
+             * PathBuf, since the .join() method returns a PathBuf*/
             let default_home_path = home_dir().unwrap().join(".stalker");
             let home_path = match init_path.get_one::<PathBuf>("PATH") {
                 Some(path) => path.join(".stalker"),
@@ -82,6 +84,8 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             /* Used Vec<&String> instead of Vec<_> to better show the data types within the vector.
              * Don't use Vec<&str> either, since &String does the deref coercion to &str by the compiler,
              * but both are essentially a different kind of data types.*/
+            /* Also a Vec<&String> is used because get_many() returns a reference to the actual
+             * value.*/
             let paths: Vec<&String> = add_subcommand.get_many::<String>("PATH").unwrap().collect();
             // TODO: Insert function to add paths to stalk-list.
         }
