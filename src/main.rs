@@ -24,7 +24,7 @@ Default stalker instance will be made on $HOME directory under '.stalker' folder
             )
         .subcommand(
             Command::new("add")
-                .about("Add path(s) to the stalk-list")
+                .about("Add path(s) to the stalk-list") 
                 .arg_required_else_help(true)
                 .arg(
                     arg!([PATH])
@@ -70,15 +70,15 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                 color::Fg(color::Green)
             );
 
-            /* &home_path is used because default_home_path is a PathBuf and home_path is also a
-             * PathBuf, since the .join() method returns a PathBuf*/
-            let default_home_path = home_dir().unwrap().join(".stalker");
-            let home_path = match init_path.get_one::<PathBuf>("PATH") {
+            let default_stalker_path = home_dir().unwrap().join(".stalker");
+            /* &stalker_path is used because default_stalker_path is a PathBuf and stalker_path is also a
+             * PathBuf, since the .join() method returns a PathBuf */
+            let stalker_path = match init_path.get_one::<PathBuf>("PATH") {
                 Some(path) => path.join(".stalker"),
-                None => default_home_path,
+                None => default_stalker_path,
             };
 
-            create_stalker_dir(&home_path);
+            create_stalker_dir(&stalker_path);
         }
         Some(("add", add_subcommand)) => {
             /* Used Vec<&String> instead of Vec<_> to better show the data types within the vector.
