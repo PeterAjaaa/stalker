@@ -47,7 +47,8 @@ pub fn update_stalk_list(stalker_instance: PathBuf, input_path: &String) {
         .append(true)
         .open(stalker_instance.join("stalklist.txt"))
     {
-        Ok(mut file) => match write!(file, "{}", input_path) {
+        // file variable is made mutable because write! macro takes a mutable handle
+        Ok(mut file) => match write!(file, "{}", input_path) {            
             Ok(_) => println!(
                 "{}{}Successfully added {} to stalklist.",
                 style::Bold,
