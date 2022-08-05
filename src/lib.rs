@@ -1,4 +1,4 @@
-use std::io::{BufWriter, Write};
+use std::io::Write;
 use std::{
     fs::{self, OpenOptions},
     path::PathBuf,
@@ -25,20 +25,18 @@ pub fn create_stalker_dir(path: &PathBuf) {
 
 // TODO: Find a way to open file only once so I/O isn't going to be expensive at big input (e.g.
 // 100, 1000, 10000+ paths)
-pub fn create_stalk_list(stalker_instance: PathBuf, input_path: &String) {
-    match fs::write(stalker_instance.join("stalklist.txt"), input_path) {
+pub fn create_stalk_list(stalker_instance: PathBuf) {
+   match fs::File::create(stalker_instance) {  
         Ok(_) => println!(
-            "{}{}Successfully added {} to stalklist.",
+            "{}{}Successfully created stalklist.",
             style::Bold,
             color::Fg(color::Green),
-            input_path
         ),
         Err(e) => eprintln!(
-            "{}{}{}Error adding {} to stalklist: {}",
+            "{}{}{}Error created stalklist: {}",
             style::Bold,
             style::Italic,
             color::Fg(color::Red),
-            input_path,
             e
         ),
     }
