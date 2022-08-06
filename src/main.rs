@@ -16,10 +16,6 @@ fn main() {
             Command::new("init")
                 .about("Initialize a stalker instance.
 The stalker instance will be made on $HOME directory under '.stalker' folder.")
-                .arg(
-                    arg!([PATH])
-                    .takes_value(true)
-                )
             )
         .subcommand(
             Command::new("add")
