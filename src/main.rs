@@ -1,6 +1,10 @@
+use std::path;
+
 use clap::{arg, Command};
 use dirs::home_dir;
-use stalker::{create_stalk_list, create_stalker_dir, update_stalk_list, list_stalk_list};
+use stalker::{
+    create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list, update_stalk_list,
+};
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
 
@@ -70,13 +74,13 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             );
             create_stalker_dir(&default_stalker_path);
         }
-        Some(("add", add_subcommand)) => {
+        Some(("add", add_path)) => {
             /* Used Vec<&String> instead of Vec<_> to better show the data types within the vector.
              * Don't use Vec<&str> either, since &String does the deref coercion to &str by the compiler,
              * but both are essentially a different kind of data types.*/
             /* Also a Vec<&String> is used because get_many() returns a reference to the actual
              * value.*/
-            let paths: Vec<&String> = add_subcommand.get_many::<String>("PATH").unwrap().collect();
+            let paths: Vec<&String> = add_path.get_many::<String>("PATH").unwrap().collect();
             if !default_stalker_path.exists() {
                 eprintln!(
                     "{}{}Error creating stalklist. No stalker instance is found.",
@@ -95,15 +99,12 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                 }
             }
         }
-        Some(("list", _list_subcommand)) => {
-            list_stalk_list(&default_stalker_path)
-        }
-        Some(("remove", remove_subcommand)) => {
-            let paths: Vec<&String> = remove_subcommand
-                .get_many::<String>("PATH")
-                .unwrap()
-                .collect();
-            // TODO: Insert function to remove paths from stalk-list.
+        Some(("list", _list_subcommand)) => list_stalk_list(&default_stalker_path),
+        Some(("remove", remove_path)) => {
+            let paths: Vec<&String> = remove_path.get_many::<String>("PATH").unwrap().collect();
+            for path in paths {
+                remove_from_list(&default_stalker_path, path)
+            }
         }
         Some(("do", do_subcommand)) => {
             let commands: Vec<&String> = do_subcommand
