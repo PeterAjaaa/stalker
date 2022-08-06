@@ -1,5 +1,3 @@
-use std::path;
-
 use clap::{arg, Command};
 use dirs::home_dir;
 use stalker::{
