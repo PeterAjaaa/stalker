@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io::{Write, BufReader, BufRead};
 use std::{
     fs::{self, OpenOptions},
     path::PathBuf,
@@ -67,6 +67,26 @@ pub fn update_stalk_list(stalker_instance: &PathBuf, input_path: &String) {
                 input_path,
                 e
             )
+        }
+    }
+}
+
+pub fn list_stalk_list(stalker_instance: &PathBuf) {
+    match fs::File::open(stalker_instance.join("stalklist.txt")) {
+        Ok(file) => {
+            for line in BufReader::new(file).lines() {
+                match line {
+                    Ok(item) => {
+                        println!("{}", item);
+                    },
+                    Err(e) => {
+                        eprintln!("Error reading line(s): {}", e);
+                    }
+                }
+            }
+        },
+        Err(e) => {
+            eprintln!("Error opening stalklist at {}: {}", stalker_instance.display(), e);
         }
     }
 }

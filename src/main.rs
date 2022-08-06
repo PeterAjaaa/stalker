@@ -1,6 +1,6 @@
 use clap::{arg, Command};
 use dirs::home_dir;
-use stalker::{create_stalk_list, create_stalker_dir, update_stalk_list};
+use stalker::{create_stalk_list, create_stalker_dir, update_stalk_list, list_stalk_list};
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
 
@@ -28,6 +28,10 @@ The stalker instance will be made on $HOME directory under '.stalker' folder.")
                         .multiple_values(true),
                 ),
         )
+        .subcommand(
+            Command::new("list")
+            .about("Get all path(s) in the stalk-list")
+            )
         .subcommand(
             Command::new("remove")
                 .about("Remove path(s) from the stalk-list")
@@ -90,6 +94,9 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                     update_stalk_list(&default_stalker_path, path);
                 }
             }
+        }
+        Some(("list", _list_subcommand)) => {
+            list_stalk_list(&default_stalker_path)
         }
         Some(("remove", remove_subcommand)) => {
             let paths: Vec<&String> = remove_subcommand
