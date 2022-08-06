@@ -1,12 +1,11 @@
-use std::path::PathBuf;
-
 use clap::{arg, Command};
 use dirs::home_dir;
-use stalker::create_stalker_dir;
+use stalker::{create_stalk_list, create_stalker_dir, update_stalk_list};
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
 
 fn main() {
+    let default_stalker_path = home_dir().unwrap().join(".stalker");
     let app = Command::new("stalker")
         .term_width(if let Some((Width(w), _)) = terminal_size() { w as usize } else { 100 })
         .version("0.1.0")
@@ -16,7 +15,7 @@ fn main() {
         .subcommand(
             Command::new("init")
                 .about("Initialize a stalker instance.
-Default stalker instance will be made on $HOME directory under '.stalker' folder.")
+The stalker instance will be made on $HOME directory under '.stalker' folder.")
                 .arg(
                     arg!([PATH])
                     .takes_value(true)
@@ -63,22 +62,13 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
         .get_matches();
 
     match app.subcommand() {
-        Some(("init", init_path)) => {
+        Some(("init", _init_path)) => {
             println!(
                 "{}{}stalker initialized...",
                 style::Bold,
                 color::Fg(color::Green)
             );
-
-            let default_stalker_path = home_dir().unwrap().join(".stalker");
-            /* &stalker_path is used because default_stalker_path is a PathBuf and stalker_path is also a
-             * PathBuf, since the .join() method returns a PathBuf */
-            let stalker_path = match init_path.get_one::<PathBuf>("PATH") {
-                Some(path) => path.join(".stalker"),
-                None => default_stalker_path,
-            };
-
-            create_stalker_dir(&stalker_path);
+            create_stalker_dir(&default_stalker_path);
         }
         Some(("add", add_subcommand)) => {
             /* Used Vec<&String> instead of Vec<_> to better show the data types within the vector.
@@ -87,7 +77,23 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             /* Also a Vec<&String> is used because get_many() returns a reference to the actual
              * value.*/
             let paths: Vec<&String> = add_subcommand.get_many::<String>("PATH").unwrap().collect();
-            // TODO: Insert function to add paths to stalk-list.
+            if !default_stalker_path.exists() {
+                eprintln!(
+                    "{}{}Error creating stalklist. No stalker instance is found.",
+                    style::Bold,
+                    color::Fg(color::Red)
+                );
+                eprintln!(
+                    "{}{}HINT: Run \"stalker init\" first before adding item(s) to the stalklist.",
+                    style::Bold,
+                    color::Fg(color::Yellow)
+                );
+            } else {
+                create_stalk_list(&default_stalker_path);
+                for path in paths {
+                    update_stalk_list(&default_stalker_path, path);
+                }
+            }
         }
         Some(("remove", remove_subcommand)) => {
             let paths: Vec<&String> = remove_subcommand

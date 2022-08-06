@@ -14,41 +14,37 @@ pub fn create_stalker_dir(path: &PathBuf) {
             path.display()
         ),
         Err(e) => eprintln!(
-            "{}{}{}Error creating stalker instance: {}",
+            "{}{}Error creating stalker instance: {}",
             style::Bold,
-            style::Italic,
             color::Fg(color::Red),
             e
         ),
     }
 }
 
-// TODO: Find a way to open file only once so I/O isn't going to be expensive at big input (e.g.
-// 100, 1000, 10000+ paths)
-pub fn create_stalk_list(stalker_instance: PathBuf) {
-   match fs::File::create(stalker_instance) {  
+pub fn create_stalk_list(stalker_instance: &PathBuf) {
+    match fs::File::create(stalker_instance.join("stalklist.txt")) {
         Ok(_) => println!(
             "{}{}Successfully created stalklist.",
             style::Bold,
             color::Fg(color::Green),
         ),
         Err(e) => eprintln!(
-            "{}{}{}Error created stalklist: {}",
+            "{}{}Error created stalklist: {}",
             style::Bold,
-            style::Italic,
             color::Fg(color::Red),
             e
         ),
     }
 }
 
-pub fn update_stalk_list(stalker_instance: PathBuf, input_path: &String) {
+pub fn update_stalk_list(stalker_instance: &PathBuf, input_path: &String) {
     match OpenOptions::new()
         .append(true)
         .open(stalker_instance.join("stalklist.txt"))
     {
         // file variable is made mutable because write! macro takes a mutable handle
-        Ok(mut file) => match write!(file, "{}", input_path) {            
+        Ok(mut file) => match writeln!(file, "{}", input_path) {
             Ok(_) => println!(
                 "{}{}Successfully added {} to stalklist.",
                 style::Bold,
@@ -56,9 +52,8 @@ pub fn update_stalk_list(stalker_instance: PathBuf, input_path: &String) {
                 input_path
             ),
             Err(e) => eprintln!(
-                "{}{}{}Error adding {} to stalklist: {}",
+                "{}{}Error adding {} to stalklist: {}",
                 style::Bold,
-                style::Italic,
                 color::Fg(color::Red),
                 input_path,
                 e
@@ -66,9 +61,8 @@ pub fn update_stalk_list(stalker_instance: PathBuf, input_path: &String) {
         },
         Err(e) => {
             eprintln!(
-                "{}{}{}Error opening stalklist at {}: {}",
+                "{}{}Error opening stalklist at {}: {}",
                 style::Bold,
-                style::Italic,
                 color::Fg(color::Red),
                 input_path,
                 e
