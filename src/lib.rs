@@ -64,7 +64,7 @@ pub fn update_stalk_list(stalker_instance: &Path, input_path: &String) {
                 "{}{}Error opening stalklist at {}: {}",
                 style::Bold,
                 color::Fg(color::Red),
-                input_path,
+                stalker_instance.display(),
                 e
             )
         }
@@ -163,6 +163,59 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
         Err(e) => {
             eprintln!(
                 "{}{}Error re-writing stalklist at {}: {}:",
+                style::Bold,
+                color::Fg(color::Red),
+                stalker_instance.display(),
+                e
+            )
+        }
+    }
+}
+
+pub fn create_commands(stalker_instance: &Path) {
+    match fs::File::create(stalker_instance.join("actionlist.txt")) {
+        Ok(_) => {
+            println!(
+                "{}{}Successfully created actionlist",
+                style::Bold,
+                color::Fg(color::Green)
+            )
+        }
+        Err(e) => {
+            eprint!(
+                "{}{}Error creating actionlist at {}: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                stalker_instance.display(),
+                e
+            )
+        }
+    }
+}
+
+pub fn update_commands(stalker_instance: &Path, command: &String) {
+    match OpenOptions::new()
+        .append(true)
+        .open(stalker_instance.join("actionlist.txt"))
+    {
+        Ok(mut file) => match writeln!(file, "{}", command) {
+            Ok(_) => println!(
+                "{}{}Successfully added {} to actionlist.",
+                style::Bold,
+                color::Fg(color::Green),
+                command
+            ),
+            Err(e) => eprintln!(
+                "{}{}Error adding {} to actionlist: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                command,
+                e
+            ),
+        },
+        Err(e) => {
+            eprintln!(
+                "{}{}Error opening actionlist at {}: {}",
                 style::Bold,
                 color::Fg(color::Red),
                 stalker_instance.display(),

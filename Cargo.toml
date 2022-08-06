@@ -12,6 +12,7 @@ readme = "README.md"
 [dependencies]
 clap = { version = "3.2.15", features = ["cargo"] }
 dirs = "4.0.0"
+execute = "0.2.11"
 sha2 = "0.10.2"
 terminal_size = "0.2.1"
 termion = "1.5.6"

@@ -1,7 +1,7 @@
 use clap::{arg, Command};
 use dirs::home_dir;
 use stalker::{
-    create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list, update_stalk_list,
+    create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list, update_stalk_list, update_commands, create_commands,
 };
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
@@ -90,6 +90,10 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                     style::Bold,
                     color::Fg(color::Yellow)
                 );
+            } else if default_stalker_path.join("stalklist.txt").exists() {
+                for path in paths {
+                    update_stalk_list(&default_stalker_path, path)
+                }
             } else {
                 create_stalk_list(&default_stalker_path);
                 for path in paths {
@@ -104,12 +108,33 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                 remove_from_list(&default_stalker_path, path)
             }
         }
-        Some(("do", do_subcommand)) => {
-            let commands: Vec<&String> = do_subcommand
+        Some(("do", user_commands)) => {
+            let commands: Vec<&String> = user_commands 
                 .get_many::<String>("COMMANDS")
                 .unwrap()
                 .collect();
-            // TODO: Insert function to execute commands on the shell.
+
+            if !default_stalker_path.exists() {
+                eprintln!(
+                    "{}{}Error creating actionlist. No stalker instance is found.",
+                    style::Bold,
+                    color::Fg(color::Red)
+                );
+                eprintln!(
+                    "{}{}HINT: Run \"stalker init\" first before adding command(s) to the actionlist.",
+                    style::Bold,
+                    color::Fg(color::Yellow)
+                    )
+            } else if default_stalker_path.join("actionlist.txt").exists() {
+                for command in commands {
+                    update_commands(&default_stalker_path, command)
+                }
+            } else {
+                create_commands(&default_stalker_path);
+                for command in commands {
+                    update_commands(&default_stalker_path, command)
+                }
+            }
         }
         Some(("execute", _execute_subcommand)) => {
             println!(
