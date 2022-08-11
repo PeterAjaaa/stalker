@@ -1,13 +1,14 @@
 use clap::{arg, Command};
 use dirs::home_dir;
 use stalker::{
-    create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list, update_stalk_list, update_commands, create_commands,
+    create_commands, create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list,
+    update_commands, update_stalk_list, run_stalker
 };
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
 
 fn main() {
-    let default_stalker_path = home_dir().unwrap().join(".stalker");
+    let default_stalker_path = home_dir().expect("Error: Cannot find $HOME directory").join(".stalker");
     let app = Command::new("stalker")
         .term_width(if let Some((Width(w), _)) = terminal_size() { w as usize } else { 100 })
         .version("0.1.0")
@@ -109,7 +110,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             }
         }
         Some(("do", user_commands)) => {
-            let commands: Vec<&String> = user_commands 
+            let commands: Vec<&String> = user_commands
                 .get_many::<String>("COMMANDS")
                 .unwrap()
                 .collect();
@@ -143,7 +144,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                 style::Italic,
                 color::Fg(color::Green)
             );
-            // TODO: Insert function to run the stalker instance.
+            run_stalker(&default_stalker_path);
         }
         _ => (), //Done because every subcommand should raise help on error.
     }

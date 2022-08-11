@@ -1,9 +1,17 @@
+use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
+use std::path::PathBuf;
+use std::process::Stdio;
+use std::sync::mpsc::channel;
+use std::time::Duration;
 use std::{
     fs::{self, OpenOptions},
     path::Path,
 };
+use execute::{Execute, command};
+use notify::{watcher, Watcher, RecursiveMode, DebouncedEvent};
 use termion::{color, style};
+use walkdir::WalkDir;
 
 pub fn create_stalker_dir(path: &Path) {
     match fs::create_dir_all(path) {
@@ -222,5 +230,103 @@ pub fn update_commands(stalker_instance: &Path, command: &String) {
                 e
             )
         }
+    }
+}
+
+pub fn run_stalker(stalker_instance: &Path) {
+    let mut path_vec: Vec<PathBuf> = Vec::new();
+    let mut command_vec: Vec<String> = Vec::new();
+
+    match File::open(stalker_instance.join("stalklist.txt")) {
+        Ok(file) => {
+            for paths in BufReader::new(file).lines() {
+                match paths {
+                    Ok(path) => {
+                        for entry in WalkDir::new(&path) {
+                            match entry {
+                                Ok(true_path) => {
+                                    path_vec.push(true_path.path().to_owned())
+                                },
+                                Err(e) => {
+                                    eprintln!("{}{}Error getting true path {}: {}", style::Bold, color::Fg(color::Red), path, e)
+                                },
+                            }
+                        }
+                    },
+                    Err(e) => {
+                        eprintln!(
+                            "{}{}Error reading stalklist at {}: {}",
+                            style::Bold,
+                            color::Fg(color::Red),
+                            stalker_instance.display(),
+                            e
+                        )
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!(
+                "{}{}Error opening stalklist at {}: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                stalker_instance.display(),
+                e
+            )
+        }
+    }
+
+    match File::open(stalker_instance.join("actionlist.txt")) {
+        Ok(file) => {
+            for actions in BufReader::new(file).lines() {
+                match actions {
+                    Ok(action) => command_vec.push(action),
+                    Err(e) => {
+                        eprintln!(
+                            "{}{}Error reading actionlist at {}: {}",
+                            style::Bold,
+                            color::Fg(color::Red),
+                            stalker_instance.display(),
+                            e
+                        )
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!(
+                "{}{}Error opening actionlist at {}: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                stalker_instance.display(),
+                e
+            )
+        }
+    }
+
+    // TODO: Fix unintended behaviour here. I need it to traverse the whole directory recursively,
+    // make a new watcher for each file, and watch each file for changes.
+    for path in path_vec {
+        let (tx,rx) = channel();
+        let mut watcher = watcher(tx, Duration::from_secs(5)).expect("Error creating watcher object");
+        watcher.watch(&path, RecursiveMode::Recursive).expect("Error watching file");
+         loop {
+             match rx.recv() {
+                 Ok(event) => {
+                     if event == DebouncedEvent::NoticeWrite(path.to_path_buf()) {
+                         for raw_command in &command_vec {
+                             let command_replaced = str::replace(raw_command, "{path}", path.to_str().expect("Error substituting command"));
+                             let mut actual_command = command(&command_replaced);
+                             actual_command.stdout(Stdio::piped());
+                             let output = actual_command.execute_output().unwrap();
+                             println!("{}", String::from_utf8(output.stdout).unwrap());
+                         }
+                     }
+                 },
+                 Err(e) => {
+                     eprintln!("{}{}Error receiving event: {}", style::Bold, color::Fg(color::Red), e)
+                 },
+             }
+         }
     }
 }
