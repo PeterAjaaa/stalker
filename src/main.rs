@@ -2,7 +2,7 @@ use clap::{arg, Command};
 use dirs::home_dir;
 use stalker::{
     create_commands, create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list,
-    update_commands, update_stalk_list, run_stalker
+    update_commands, update_stalk_list, run_stalker, list_action_list
 };
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
@@ -34,6 +34,10 @@ The stalker instance will be made on $HOME directory under '.stalker' folder.")
         .subcommand(
             Command::new("list")
             .about("Get all path(s) in the stalk-list")
+            )
+        .subcommand(
+            Command::new("list-action")
+            .about("Get all action(s) in the action-list")
             )
         .subcommand(
             Command::new("remove")
@@ -103,6 +107,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             }
         }
         Some(("list", _list_subcommand)) => list_stalk_list(&default_stalker_path),
+        Some(("list-action", _list_action_subcommand)) => list_action_list(&default_stalker_path),
         Some(("remove", remove_path)) => {
             let paths: Vec<&String> = remove_path.get_many::<String>("PATH").unwrap().collect();
             for path in paths {

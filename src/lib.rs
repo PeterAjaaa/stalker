@@ -79,6 +79,38 @@ pub fn update_stalk_list(stalker_instance: &Path, input_path: &String) {
     }
 }
 
+pub fn list_action_list(stalker_instance: &Path) {
+    match fs::File::open(stalker_instance.join("actionlist.txt")) {
+        Ok(file) => {
+            for line in BufReader::new(file).lines() {
+                match line {
+                    Ok(item) => {
+                        println!("{}{}{}", style::Bold, color::Fg(color::Blue), item);
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "{}{}Error reading line(s): {}",
+                            style::Bold,
+                            color::Fg(color::Red),
+                            e
+                        )
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!(
+                "{}{}Error opening actionlist at {}: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                stalker_instance.display(),
+                e
+            )
+        }
+    }
+}
+
+
 pub fn list_stalk_list(stalker_instance: &Path) {
     match fs::File::open(stalker_instance.join("stalklist.txt")) {
         Ok(file) => {
