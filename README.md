@@ -75,3 +75,4 @@ The usual workflow goes like this:
 - Cross-platform compability.
 - Multiple stalker instances support.
 - Removal of *expensive* operation where possible.
+- Better file format to store action and paths for the stalker instance.
