@@ -43,6 +43,10 @@ If you have got Rust installed in your machine, follow these steps:
 
 		git clone https://github.com/PeterAjaaa/stalker
 
+	or for the stable release branch:
+
+		git clone https://github.com/PeterAjaaa/stalker/tree/main
+
 2. Enter the `stalker` directory.
 
 		cd stalker
