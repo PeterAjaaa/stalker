@@ -142,7 +142,8 @@ pub fn list_stalk_list(stalker_instance: &Path) {
     }
 }
 
-pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
+// TODO: Finish this function, it is still incomplete.
+pub fn remove_from_list(stalker_instance: &Path, path_to_remove: Vec<&String>) {
     let mut temp_vec: Vec<String> = Vec::new();
 
     match fs::File::open(stalker_instance.join("stalklist.txt")) {
@@ -177,6 +178,8 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
     }
 
     // TODO: Show the remove message, since right now it is not working
+    // Found the culprit, it's about the number of item in the temp_vec
+    // If there's 3 item in the temp_vec, the remove message will show twice and so on
     match fs::File::create(stalker_instance.join("stalklist.txt")) {
         Ok(mut file) => {
             for path in temp_vec {
