@@ -177,18 +177,17 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: Vec<&String>) {
             style::Bold,
             color::Fg(color::Red),
             stalker_instance.join("stalklist.txt").display(),
-            );
-        return ;
-    } else if stalklist_item.len() == 0 {
+        );
+        return;
+    } else if stalklist_item.is_empty() {
         eprintln!(
             "{}{}Error deleting item from stalklist at {}: stalklist.txt is empty",
             style::Bold,
             color::Fg(color::Red),
             stalker_instance.join("stalklist.txt").display(),
-            );
-        return ;
+        );
+        return;
     }
-
 
     for item in path_to_remove {
         stalklist_item.retain(|i| i != item);
@@ -197,7 +196,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: Vec<&String>) {
             style::Bold,
             color::Fg(color::Green),
             item
-            );
+        );
     }
 
     match fs::File::create(stalker_instance.join("stalklist.txt")) {
@@ -212,7 +211,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: Vec<&String>) {
                             color::Fg(color::Red),
                             stalker_instance.display(),
                             e
-                            )
+                        )
                     }
                 }
             }
@@ -224,7 +223,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: Vec<&String>) {
                 color::Fg(color::Red),
                 stalker_instance.display(),
                 e
-                )
+            )
         }
     }
 }
@@ -236,7 +235,7 @@ pub fn create_commands(stalker_instance: &Path) {
                 "{}{}Successfully created actionlist",
                 style::Bold,
                 color::Fg(color::Green)
-                )
+            )
         }
         Err(e) => {
             eprint!(
@@ -245,7 +244,7 @@ pub fn create_commands(stalker_instance: &Path) {
                 color::Fg(color::Red),
                 stalker_instance.display(),
                 e
-                )
+            )
         }
     }
 }
@@ -254,32 +253,32 @@ pub fn update_commands(stalker_instance: &Path, command: &String) {
     match OpenOptions::new()
         .append(true)
         .open(stalker_instance.join("actionlist.txt"))
-        {
-            Ok(mut file) => match writeln!(file, "{}", command) {
-                Ok(_) => println!(
-                    "{}{}Successfully added {} to actionlist.",
-                    style::Bold,
-                    color::Fg(color::Green),
-                    command
-                    ),
-                Err(e) => eprintln!(
-                    "{}{}Error adding {} to actionlist: {}",
-                    style::Bold,
-                    color::Fg(color::Red),
-                    command,
-                    e
-                    ),
-            },
-            Err(e) => {
-                eprintln!(
-                    "{}{}Error opening actionlist at {}: {}",
-                    style::Bold,
-                    color::Fg(color::Red),
-                    stalker_instance.display(),
-                    e
-                    )
-            }
+    {
+        Ok(mut file) => match writeln!(file, "{}", command) {
+            Ok(_) => println!(
+                "{}{}Successfully added {} to actionlist.",
+                style::Bold,
+                color::Fg(color::Green),
+                command
+            ),
+            Err(e) => eprintln!(
+                "{}{}Error adding {} to actionlist: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                command,
+                e
+            ),
+        },
+        Err(e) => {
+            eprintln!(
+                "{}{}Error opening actionlist at {}: {}",
+                style::Bold,
+                color::Fg(color::Red),
+                stalker_instance.display(),
+                e
+            )
         }
+    }
 }
 
 pub fn run_stalker(stalker_instance: &Path) {
@@ -301,7 +300,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                                         color::Fg(color::Red),
                                         path,
                                         e
-                                        )
+                                    )
                                 }
                             }
                         }
@@ -313,7 +312,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                             color::Fg(color::Red),
                             stalker_instance.display(),
                             e
-                            )
+                        )
                     }
                 }
             }
@@ -325,7 +324,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                 color::Fg(color::Red),
                 stalker_instance.display(),
                 e
-                )
+            )
         }
     }
 
@@ -341,7 +340,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                             color::Fg(color::Red),
                             stalker_instance.display(),
                             e
-                            )
+                        )
                     }
                 }
             }
@@ -353,7 +352,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                 color::Fg(color::Red),
                 stalker_instance.display(),
                 e
-                )
+            )
         }
     }
 
@@ -373,7 +372,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                                 raw_command,
                                 "{path}",
                                 path.to_str().expect("Error substituting command"),
-                                );
+                            );
                             let mut actual_command = command(&command_replaced);
                             actual_command.stdout(Stdio::piped());
                             let output = actual_command.execute_output().unwrap();
@@ -388,7 +387,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                         style::Bold,
                         color::Fg(color::Red),
                         e
-                        )
+                    )
                 }
             }
         }
