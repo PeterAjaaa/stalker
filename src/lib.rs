@@ -170,7 +170,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
                 "{}{}Error opening stalklist at {}: {}",
                 style::Bold,
                 color::Fg(color::Red),
-                stalker_instance.display(),
+                stalker_instance.join("stalklist.txt").display(),
                 e
             )
         }
