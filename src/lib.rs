@@ -337,8 +337,6 @@ pub fn run_stalker(stalker_instance: &Path) {
         }
     }
 
-    // TODO: Fix unintended behaviour here. I need it to traverse the whole directory recursively,
-    // make a new watcher for each file, and watch each file for changes.
     for path in path_vec {
         let (tx,rx) = channel();
         let mut watcher = watcher(tx, Duration::from_secs(5)).expect("Error creating watcher object");
