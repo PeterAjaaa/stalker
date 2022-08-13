@@ -1,14 +1,16 @@
 use clap::{arg, Command};
 use dirs::home_dir;
 use stalker::{
-    create_commands, create_stalk_list, create_stalker_dir, list_stalk_list, remove_from_list,
-    update_commands, update_stalk_list, run_stalker, list_action_list
+    create_commands, create_stalk_list, create_stalker_dir, list_action_list, list_stalk_list,
+    remove_from_list, run_stalker, update_commands, update_stalk_list,
 };
 use terminal_size::{terminal_size, Width};
 use termion::{color, style};
 
 fn main() {
-    let default_stalker_path = home_dir().expect("Error: Cannot find $HOME directory").join(".stalker");
+    let default_stalker_path = home_dir()
+        .expect("Error: Cannot find $HOME directory")
+        .join(".stalker");
     let app = Command::new("stalker")
         .term_width(if let Some((Width(w), _)) = terminal_size() { w as usize } else { 100 })
         .version("0.1.0")
@@ -110,9 +112,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
         Some(("list-action", _list_action_subcommand)) => list_action_list(&default_stalker_path),
         Some(("remove", remove_path)) => {
             let paths: Vec<&String> = remove_path.get_many::<String>("PATH").unwrap().collect();
-            for path in paths {
-                remove_from_list(&default_stalker_path, path)
-            }
+            remove_from_list(&default_stalker_path, paths)
         }
         Some(("do", user_commands)) => {
             let commands: Vec<&String> = user_commands
