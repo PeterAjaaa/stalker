@@ -53,7 +53,7 @@ The stalker instance will be made on $HOME directory under '.stalker' folder.")
         .subcommand(
             Command::new("do")
                 .about("Specify operation(s) on item(s) in the stalk-list. Put the commands inside of quotes (\"\").
-Each separate command should be placed inside of separate quotes (e.g. \"git add *\" \"git commit\").")
+Each separate command should be placed inside of separate quotes (e.g. \"git add *\" \"git commit\"). To insert path that's listed in the stalklist, use {path} as the placeholder (e.g. \"git add {path}\").")
                 .arg_required_else_help(true)
                 .arg(
                     arg!([COMMANDS])
