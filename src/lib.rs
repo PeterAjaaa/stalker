@@ -176,6 +176,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
         }
     }
 
+    // TODO: Show the remove message, since right now it is not working
     match fs::File::create(stalker_instance.join("stalklist.txt")) {
         Ok(mut file) => {
             for path in temp_vec {
@@ -187,7 +188,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
                             color::Fg(color::Green),
                             path_to_remove
                         )
-                    }
+                    },
                     Err(e) => {
                         eprintln!(
                             "{}{}Error writing path(s) to stalklist at {}: {}",
@@ -202,7 +203,7 @@ pub fn remove_from_list(stalker_instance: &Path, path_to_remove: &String) {
         }
         Err(e) => {
             eprintln!(
-                "{}{}Error re-writing stalklist at {}: {}:",
+                "{}{}Error re-writing stalklist at {}: {}",
                 style::Bold,
                 color::Fg(color::Red),
                 stalker_instance.display(),
@@ -351,6 +352,7 @@ pub fn run_stalker(stalker_instance: &Path) {
                              let mut actual_command = command(&command_replaced);
                              actual_command.stdout(Stdio::piped());
                              let output = actual_command.execute_output().unwrap();
+                             println!("{}{}", color::Fg(color::Reset), style::Reset);
                              println!("{}", String::from_utf8(output.stdout).unwrap());
                          }
                      }
