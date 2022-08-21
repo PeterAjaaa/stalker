@@ -1,11 +1,13 @@
 use clap::{arg, Command};
+use crossterm::execute;
+use crossterm::style::{Color, Print, ResetColor, SetForegroundColor};
 use dirs::home_dir;
 use stalker::{
     create_commands, create_stalk_list, create_stalker_dir, list_action_list, list_stalk_list,
-    remove_from_list, run_stalker, update_commands, update_stalk_list,
+    remove_from_stalklist, run_stalker, update_commands, update_stalk_list,
 };
+use std::io::stdout;
 use terminal_size::{terminal_size, Width};
-use termion::{color, style};
 
 fn main() {
     let default_stalker_path = home_dir()
@@ -72,11 +74,15 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
 
     match app.subcommand() {
         Some(("init", _init_path)) => {
-            println!(
-                "{}{}stalker initialized...",
-                style::Bold,
-                color::Fg(color::Green)
-            );
+            match execute!(
+                stdout(),
+                SetForegroundColor(Color::Red),
+                Print("stalker initialized"),
+                ResetColor
+            ) {
+                Ok(_) => {}
+                Err(_) => eprintln!("Error printing stalker init message"),
+            }
             create_stalker_dir(&default_stalker_path);
         }
         Some(("add", add_path)) => {
@@ -87,16 +93,26 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
              * value.*/
             let paths: Vec<&String> = add_path.get_many::<String>("PATH").unwrap().collect();
             if !default_stalker_path.exists() {
-                eprintln!(
-                    "{}{}Error creating stalklist. No stalker instance is found.",
-                    style::Bold,
-                    color::Fg(color::Red)
-                );
-                eprintln!(
-                    "{}{}HINT: Run \"stalker init\" first before adding item(s) to the stalklist.",
-                    style::Bold,
-                    color::Fg(color::Yellow)
-                );
+                match execute!(
+                    stdout(),
+                    SetForegroundColor(Color::Red),
+                    Print("Error creating stalklist. No stalker instance is found."),
+                    ResetColor
+                ) {
+                    Ok(_) => {}
+                    Err(_) => eprintln!("Error printing stalker add error message"),
+                }
+                match execute!(
+                    stdout(),
+                    SetForegroundColor(Color::Yellow),
+                    Print(
+                        "HINT: Run \"stalker init\" first before adding item(s) to the stalklist."
+                    ),
+                    ResetColor
+                ) {
+                    Ok(_) => {}
+                    Err(_) => eprintln!("Error printing stalker add hint message"),
+                }
             } else if default_stalker_path.join("stalklist.txt").exists() {
                 for path in paths {
                     update_stalk_list(&default_stalker_path, path)
@@ -112,7 +128,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
         Some(("list-action", _list_action_subcommand)) => list_action_list(&default_stalker_path),
         Some(("remove", remove_path)) => {
             let paths: Vec<&String> = remove_path.get_many::<String>("PATH").unwrap().collect();
-            remove_from_list(&default_stalker_path, paths)
+            remove_from_stalklist(&default_stalker_path, paths)
         }
         Some(("do", user_commands)) => {
             let commands: Vec<&String> = user_commands
@@ -121,16 +137,24 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                 .collect();
 
             if !default_stalker_path.exists() {
-                eprintln!(
-                    "{}{}Error creating actionlist. No stalker instance is found.",
-                    style::Bold,
-                    color::Fg(color::Red)
-                );
-                eprintln!(
-                    "{}{}HINT: Run \"stalker init\" first before adding command(s) to the actionlist.",
-                    style::Bold,
-                    color::Fg(color::Yellow)
-                    )
+                match execute!(
+                    stdout(),
+                    SetForegroundColor(Color::Red),
+                    Print("Error creating actionlist. No stalker instance is found."),
+                    ResetColor
+                ) {
+                    Ok(_) => {}
+                    Err(_) => eprintln!("Error printing stalker do error message"),
+                }
+                match execute!(
+                    stdout(),
+                    SetForegroundColor(Color::Yellow),
+                    Print("HINT: Run \"stalker init\" first before adding command(s) to the actionlist."),
+                    ResetColor
+                    ) {
+                   Ok(_) => {},
+                   Err(_) => eprintln!("Error printing stalker do hint message")
+                }
             } else if default_stalker_path.join("actionlist.txt").exists() {
                 for command in commands {
                     update_commands(&default_stalker_path, command)
@@ -143,12 +167,6 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             }
         }
         Some(("execute", _execute_subcommand)) => {
-            println!(
-                "{}{}{}Running stalker...",
-                style::Bold,
-                style::Italic,
-                color::Fg(color::Green)
-            );
             run_stalker(&default_stalker_path);
         }
         _ => (), //Done because every subcommand should raise help on error.

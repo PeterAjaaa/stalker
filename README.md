@@ -76,7 +76,8 @@ The usual workflow goes like this:
 
 ## Todo
 
-- Cross-platform compability.
+~~Cross-platform compability.~~
 - Multiple stalker instances support.
 - Removal of *expensive* operation where possible.
 - Better file format to store action and paths for the stalker instance.
+- Action removal from actionlist.
