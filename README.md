@@ -13,7 +13,7 @@ Stalker will watch over user specified files and directories for changes in the 
 - Git-like syntax.
 - Context-aware (It will not do anything to unrelated files, even if these files is under stalker supervision)
 - Easy to integrate with other CLI applications.
-- Runnable as daemon.
+- Runnable as a background process.
 
 ## Installation
 
@@ -23,9 +23,9 @@ Get the appropriate executable file for your corresponding OS.
 
 ***Important Note!***
 
-**Linux** executables is the one without the extension (i.e. `stalk`).
+**Linux** executables is the one ***without*** the extension (i.e. `stalk`).
 
-**Windows** executables is the one with the extension (i.e. `stalk.exe`).
+**Windows** executables is the one ***with*** the extension (i.e. `stalk.exe`).
 
 **Optional :**
 
@@ -74,9 +74,17 @@ The usual workflow goes like this:
 	stalk do program-or-shell-command-to-run
 	stalk execute
 
+## Gotcha(s)
+
+- ***DO NOT USE SHELL PATH EXPANSION WHEN SPECIFYING STALK DO COMMAND (E.G. THE USE OF ~ TO SPECIFY $HOME DIRECTORY, OR THE USE OF * TO SPECIFY ALL ITEMS IN A PATH). IT WILL NOT WORK!***
+
+- ***DO NOT USE RELATIVE PATHS WHEN SPECIFYING STALK DO COMMAND (E.G. THE USE OF ../some-directory TO SPECIFY THE PARENT DIRECTORY RELATIVE TO CURRENT WORKING LOCATION). IT WILL NOT WORK!***
+
+- ***USE ABSOLUTE PATHS WHEN SPECIFYING "STALK DO" COMMAND.***
+
 ## Todo
 
-~~Cross-platform compability.~~
+- ~~Cross-platform compability.~~
 - Multiple stalker instances support.
 - Removal of *expensive* operation where possible.
 - Better file format to store action and paths for the stalker instance.
