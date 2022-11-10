@@ -70,7 +70,7 @@ To get help for each individual subcommand, run:
 The usual workflow goes like this:
 
 	stalk init
-	stalk add path1 path2 path3 file1 file2 file 3
+	stalk add path1 path2 path3 file1 file2 file3
 	stalk do program-or-shell-command-to-run
 	stalk execute
 
