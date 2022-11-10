@@ -229,7 +229,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
                             ResetColor
                             ) {
                             Ok(_) => {},
-                            Err(e) => eprintln!("Error printing stalklist item removal error output on remove_from_list function: {}", e)
+                            Err(e) => eprintln!("Error printing stalklist item removal error output on remove_from_stalklist function: {}", e)
                         }
                     }
                 }
@@ -243,7 +243,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
                 ResetColor
                 ) {
                 Ok(_) => {},
-                Err(e) => eprintln!("Error printing stalklist opening error output on remove_from_list function: {}", e)
+                Err(e) => eprintln!("Error printing stalklist opening error output on remove_from_stalklist function: {}", e)
             }
         }
     }
@@ -256,7 +256,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
             ResetColor
             ) {
             Ok(_) => {},
-            Err(e) => eprintln!("Error printing stalklist existence checking error output on remove_from_list function: {}", e)
+            Err(e) => eprintln!("Error printing stalklist existence checking error output on remove_from_stalklist function: {}", e)
         }
         return;
     } else if stalklist_item.is_empty() {
@@ -267,7 +267,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
             ResetColor
             ) {
             Ok(_) => {},
-            Err(e) => eprintln!("Error printing stalklist empty checking error output on remove_from_list function: {}", e)
+            Err(e) => eprintln!("Error printing stalklist empty checking error output on remove_from_stalklist function: {}", e)
         }
         return;
     }
@@ -282,7 +282,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
         ) {
             Ok(_) => {}
             Err(e) => eprintln!(
-                "Error printing remove stalklist item output on remove_from_list function: {}",
+                "Error printing remove stalklist item output on remove_from_stalklist function: {}",
                 e
             ),
         }
@@ -301,7 +301,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
                             ResetColor
                             ) {
                             Ok(_) => {},
-                            Err(e) => eprintln!("Error printing stalklist line rewrite error output on remove_from_list function: {}", e)
+                            Err(e) => eprintln!("Error printing stalklist line rewrite error output on remove_from_stalklist function: {}", e)
                         }
                     }
                 }
@@ -315,7 +315,7 @@ pub fn remove_from_stalklist(stalker_instance: &Path, path_to_remove: Vec<&Strin
                 ResetColor
                 ) {
                 Ok(_) => {}
-                Err(e) => eprintln!("Error printing stalklist file rewrite error output on remove_from_list function: {}", e)
+                Err(e) => eprintln!("Error printing stalklist file rewrite error output on remove_from_stalklist function: {}", e)
             }
         }
     }
@@ -392,6 +392,115 @@ pub fn update_commands(stalker_instance: &Path, command: &String) {
         }
     }
 }
+
+pub fn remove_from_actionlist(stalker_instance: &Path, action_to_remove: Vec<&String>) {
+    let mut action_item: Vec<String> = Vec::new();
+
+    match fs::File::open(stalker_instance.join("actionlist.txt")) {
+        Ok(file) => {
+            for line in BufReader::new(file).lines() {
+                match line {
+                    Ok(item) => action_item.push(item),
+                    Err(e) => {
+                        match execute!(
+                            stdout(),
+                            SetForegroundColor(Color::Red),
+                            Print(format!("Error reading line(s): {}\n", e)),
+                            ResetColor
+                            ) {
+                            Ok(_) => {},
+                            Err(e) => eprintln!("Error printing actionlist item removal error output on remove_from_actionlist function: {}", e)
+                        }
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            match execute!(
+                stdout(),
+                SetForegroundColor(Color::Red),
+                Print(format!("Error opening actionlist at {}: {}\n", stalker_instance.join("actionlist.txt").display(), e)),
+                ResetColor
+                ) {
+                Ok(_) => {},
+                Err(e) => eprintln!("Error printing actionlist opening error output on remove_from_ actionlist function: {}", e)
+            }
+        }
+    }
+
+    if !stalker_instance.join("actionlist.txt").exists() {
+        match execute!(
+            stdout(),
+            SetForegroundColor(Color::Red),
+            Print(format!("Error opening actionlist at {}: Cannot find actionlist.txt\n", stalker_instance.join("actionlist.txt").display())),
+            ResetColor
+            ) {
+            Ok(_) => {},
+            Err(e) => eprintln!("Error printing actionlist existence checking error output on remove_from_actionlist function: {}", e)
+        }
+        return;
+    } else if action_item.is_empty() {
+        match execute!(
+            stdout(),
+            SetForegroundColor(Color::Red),
+            Print(format!("Error deleting item from actionlist at {}: actionlist.txt is empty\n", stalker_instance.join("actionlist.txt").display())),
+            ResetColor
+            ) {
+            Ok(_) => {},
+            Err(e) => eprintln!("Error printing actionlist empty checking error output on remove_from_actionlist function: {}", e)
+        }
+        return;
+    }
+
+    for item in path_to_remove {
+        action_item.retain(|i| i != item);
+        match execute!(
+            stdout(),
+            SetForegroundColor(Color::Green),
+            Print(format!("Successfully removed {} from actionlist\n", item)),
+            ResetColor
+        ) {
+            Ok(_) => {}
+            Err(e) => eprintln!(
+                "Error printing remove actionlist item output on remove_from_actionlist function: {}",
+                e
+            ),
+        }
+    }
+
+    match fs::File::create(stalker_instance.join("actionlist.txt")) {
+        Ok(mut file) => {
+            for path in action_item{
+                match writeln!(file, "{}", path) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        match execute!(
+                            stdout(),
+                            SetForegroundColor(Color::Red),
+                            Print(format!("Error writing path(s) to actionlist at {}: {}\n", stalker_instance.display(), e)),
+                            ResetColor
+                            ) {
+                            Ok(_) => {},
+                            Err(e) => eprintln!("Error printing actionlist line rewrite error output on remove_from_actionlist function: {}", e)
+                        }
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            match execute!(
+                stdout(),
+                SetForegroundColor(Color::Red),
+                Print(format!("Error re-writing actionlist at {}: {}\n", stalker_instance.display(), e)),
+                ResetColor
+                ) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Error printing actionlist file rewrite error output on remove_from_actionlist function: {}", e)
+            }
+        }
+    }
+}
+
 
 pub fn run_stalker(stalker_instance: &Path) {
     let mut path_vec: Vec<PathBuf> = Vec::new();
