@@ -88,4 +88,4 @@ The usual workflow goes like this:
 - Multiple stalker instances support.
 - Removal of *expensive* operation where possible.
 - Better file format to store action and paths for the stalker instance.
-- Action removal from actionlist.
+- Action removal from actionlist. [WORK IN PROGRESES]
