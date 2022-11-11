@@ -327,7 +327,7 @@ pub fn create_commands(stalker_instance: &Path) {
             match execute!(
                 stdout(),
                 SetForegroundColor(Color::Green),
-                Print(format!("Successfully created actionlist\n")),
+                Print("Successfully created actionlist\n"),
                 ResetColor
                 ) {
                Ok(_) => {},
@@ -452,7 +452,7 @@ pub fn remove_from_actionlist(stalker_instance: &Path, action_to_remove: Vec<&St
         return;
     }
 
-    for item in path_to_remove {
+    for item in action_to_remove {
         action_item.retain(|i| i != item);
         match execute!(
             stdout(),
