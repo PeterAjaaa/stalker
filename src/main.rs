@@ -45,7 +45,7 @@ The stalker instance will be made on $HOME directory under '.stalker' folder.")
             )
         .subcommand(
             Command::new("remove")
-                .about("Remove path(s) from the stalk-list")
+                .about("Remove path(s) from the stalk-list. Put the path to remove inside of quotes (\"\"). To remove multiple paths, use space (\" \") to separate each path.")
                 .arg_required_else_help(true)
                 .arg(
                     arg!([PATH])
@@ -56,7 +56,7 @@ The stalker instance will be made on $HOME directory under '.stalker' folder.")
         )
         .subcommand(
             Command::new("remove-action")
-            .about("Remove actions(s) from the stalk-list")
+            .about("Remove actions(s) from the action-list. Put the command to remove inside of quotes (\"\"). To remove multiple commands, use space (\" \") to separate each command.")
             .arg_required_else_help(true)
             .arg(
                 arg!([ACTION])
