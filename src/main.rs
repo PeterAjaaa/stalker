@@ -4,7 +4,7 @@ use crossterm::style::{Color, Print, ResetColor, SetForegroundColor};
 use dirs::home_dir;
 use stalker::{
     create_commands, create_stalk_list, create_stalker_dir, list_action_list, list_stalk_list,
-    remove_from_stalklist, run_stalker, update_commands, update_stalk_list,
+    remove_from_stalklist, remove_from_actionlist, run_stalker, update_commands, update_stalk_list,
 };
 use std::io::stdout;
 use terminal_size::{terminal_size, Width};
@@ -55,17 +55,28 @@ The stalker instance will be made on $HOME directory under '.stalker' folder.")
                 ),
         )
         .subcommand(
-            Command::new("do")
-                .about("Specify operation(s) on item(s) in the stalk-list. Put the commands inside of quotes (\"\").
-Each separate command should be placed inside of separate quotes (e.g. \"git add *\" \"git commit\"). To insert path that's listed in the stalklist, use {path} as the placeholder (e.g. \"git add {path}\").")
-                .arg_required_else_help(true)
-                .arg(
-                    arg!([COMMANDS])
-                        .required(true)
-                        .takes_value(true)
-                        .multiple_values(true),
+            Command::new("remove-action")
+            .about("Remove actions(s) from the stalk-list")
+            .arg_required_else_help(true)
+            .arg(
+                arg!([ACTION])
+                .required(true)
+                .takes_value(true)
+                .multiple_values(true),
                 ),
         )
+        .subcommand(
+            Command::new("do")
+            .about("Specify operation(s) on item(s) in the stalk-list. Put the commands inside of quotes (\"\").
+Each separate command should be placed inside of separate quotes (e.g. \"git add *\" \"git commit\"). To insert path that's listed in the stalklist, use {path} as the placeholder (e.g. \"git add {path}\").")
+            .arg_required_else_help(true)
+            .arg(
+                arg!([COMMANDS])
+                .required(true)
+                .takes_value(true)
+                .multiple_values(true),
+                ),
+                )
         .subcommand(
             Command::new("execute")
             .about("Execute commands specified by 'stalk do' on path(s) specified by 'stalk-add'. Commands will be executed whenever there's changes on the specified file(s) on the specified path(s).")
@@ -76,10 +87,10 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
         Some(("init", _init_path)) => {
             match execute!(
                 stdout(),
-                SetForegroundColor(Color::Red),
-                Print("stalker initialized"),
+                SetForegroundColor(Color::Green),
+                Print("stalker initialized\n"),
                 ResetColor
-            ) {
+                ) {
                 Ok(_) => {}
                 Err(_) => eprintln!("Error printing stalker init message"),
             }
@@ -98,7 +109,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                     SetForegroundColor(Color::Red),
                     Print("Error creating stalklist. No stalker instance is found."),
                     ResetColor
-                ) {
+                    ) {
                     Ok(_) => {}
                     Err(_) => eprintln!("Error printing stalker add error message"),
                 }
@@ -107,9 +118,9 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                     SetForegroundColor(Color::Yellow),
                     Print(
                         "HINT: Run \"stalker init\" first before adding item(s) to the stalklist."
-                    ),
-                    ResetColor
-                ) {
+                        ),
+                        ResetColor
+                        ) {
                     Ok(_) => {}
                     Err(_) => eprintln!("Error printing stalker add hint message"),
                 }
@@ -130,6 +141,11 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
             let paths: Vec<&String> = remove_path.get_many::<String>("PATH").unwrap().collect();
             remove_from_stalklist(&default_stalker_path, paths)
         }
+        Some(("remove-action", remove_action)) => {
+            let actions: Vec<&String> = remove_action.get_many::<String>("ACTION").unwrap().collect();
+            remove_from_actionlist(&default_stalker_path, actions);
+        }
+
         Some(("do", user_commands)) => {
             let commands: Vec<&String> = user_commands
                 .get_many::<String>("COMMANDS")
@@ -142,7 +158,7 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                     SetForegroundColor(Color::Red),
                     Print("Error creating actionlist. No stalker instance is found."),
                     ResetColor
-                ) {
+                    ) {
                     Ok(_) => {}
                     Err(_) => eprintln!("Error printing stalker do error message"),
                 }
@@ -152,8 +168,8 @@ Each separate command should be placed inside of separate quotes (e.g. \"git add
                     Print("HINT: Run \"stalker init\" first before adding command(s) to the actionlist."),
                     ResetColor
                     ) {
-                   Ok(_) => {},
-                   Err(_) => eprintln!("Error printing stalker do hint message")
+                    Ok(_) => {},
+                    Err(_) => eprintln!("Error printing stalker do hint message")
                 }
             } else if default_stalker_path.join("actionlist.txt").exists() {
                 for command in commands {
